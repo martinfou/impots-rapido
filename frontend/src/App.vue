@@ -1,60 +1,57 @@
 <template>
-  <v-app>
-    <v-app-bar
-      app
-      color="secondary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-content>
-      <v-row>
-      hello world
-      </v-row>
-    </v-content>
-  </v-app>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">Vue Axios Post - ItSolutionStuff.com</div>
+    
+                    <div class="card-body">
+                        <form @submit="formSubmit">
+                        <strong>Name:</strong>
+                        <input type="text" class="form-control" v-model="name">
+                        <strong>Description:</strong>
+                        <textarea class="form-control" v-model="description"></textarea>
+    
+                        <button class="btn btn-success">Submit</button>
+                        </form>
+                        <strong>Output:</strong>
+                        <pre>
+                        {{output}}
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
-
+     
 <script>
-
-export default {
-  name: 'App',
-
-  components: {
-  },
-
-  data: () => ({
-    //
-  }),
-};
+    export default {
+        mounted() {
+            console.log('Component mounted.')
+        },
+        data() {
+            return {
+              name: '',
+              description: '',
+              output: ''
+            };
+        },
+        methods: {
+            formSubmit(e) {
+                e.preventDefault();
+                let currentObj = this;
+                this.axios.post('http://localhost:8080/upload', {
+                    name: this.name,
+                    description: this.description
+                })
+                .then(function (response) {
+                    currentObj.output = response.data;
+                })
+                .catch(function (error) {
+                    currentObj.output = error;
+                });
+            }
+        }
+    }
 </script>

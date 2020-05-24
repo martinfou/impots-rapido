@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -36,7 +37,8 @@ public class FinancialDataParser {
 		OFX
 	}
 
-	public ResponseEnvelope parse(String financialDataFile) throws IOException, OFXParseException {
+	public TransactionList parse(String financialDataFile) throws IOException, OFXParseException {
+			
 		URL fileUrl = this.getClass().getClassLoader().getResource(financialDataFile);
 		if(null==fileUrl) {
 			throw new IOException("file " + financialDataFile + " not found.");
@@ -45,32 +47,36 @@ public class FinancialDataParser {
 		 AggregateUnmarshaller<ResponseEnvelope> unmarshaller  = new AggregateUnmarshaller<ResponseEnvelope>(ResponseEnvelope.class);
 		 ResponseEnvelope envelope = unmarshaller.unmarshal(file);
 		 BankingResponseMessageSet messageSet = (BankingResponseMessageSet) envelope.getMessageSet(MessageSetType.banking);
-		 List<BankStatementResponseTransaction> responses = messageSet.getStatementResponses();
-         for (BankStatementResponseTransaction response : responses) {
-
-             BankStatementResponse message = response.getMessage();
-             String currencyCode = message.getCurrencyCode();
-             String acct_number = message.getAccount().getAccountNumber();
-             double av = message.getAvailableBalance().getAmount();
-             double cur = message.getLedgerBalance().getAmount();
-             AccountType acct_type = message.getAccount().getAccountType();
-             
-             TransactionList transactionList = message.getTransactionList();
-             
-             for(Transaction transaction : message.getTransactionList().getTransactions()) {
-            	 transaction.getAmount();
-            	 transaction.getName();
-            	 Date mydate = transaction.getDatePosted();
-            	 int year = mydate.getYear();
-            	 int month = mydate.getMonth();
-            	 int day = mydate.getDay();
-            	 System.out.println(transaction.getDatePosted() + " " + transaction.getName() + " " + transaction.getAmount() + " " +  transaction.toString());	 
-             }
-             
-             System.out.println(currencyCode + " " + acct_number + " " + av + " " + acct_type);
-         }
-		return envelope;
-		
+		 
+		 return messageSet.getStatementResponses().get(0).getMessage().getTransactionList();
+		 
+		 
+//         for (BankStatementResponseTransaction response : responses) {
+//        	 
+//             BankStatementResponse message = response.getMessage();
+//             String currencyCode = message.getCurrencyCode();
+//             String acct_number = message.getAccount().getAccountNumber();
+//             double av = message.getAvailableBalance().getAmount();
+//             double cur = message.getLedgerBalance().getAmount();
+//             AccountType acct_type = message.getAccount().getAccountType();
+//             
+//             
+//             
+//             
+//             for(Transaction transaction : message.getTransactionList().getTransactions()) {
+//            	 transaction.getAmount();
+//            	 transaction.getName();
+//            	 transaction.getTransactionType();
+//            	 SimpleDateFormat dt1 = new SimpleDateFormat("yyyy-mm-dd");
+//            	 String transactionDate = dt1.format(transaction.getDatePosted());
+//            	 int year = transaction.getDatePosted().getYear();
+//            	 int month = transaction.getDatePosted().getMonth();
+//            	 int day = transaction.getDatePosted().getDay();
+//            	 System.out.println(transactionDate + " | " + transaction.getName() + " | " +  transaction.getMemo() + " | " + transaction.getAmount());	 
+//             }
+//             
+//             System.out.println(currencyCode + " " + acct_number + " " + av + " " + acct_type);
+//         }		
 	}
 
 }

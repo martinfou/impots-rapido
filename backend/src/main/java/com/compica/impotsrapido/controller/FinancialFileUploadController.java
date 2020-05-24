@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class FinancialFileUploadController {
 
 	@RequestMapping("/upload")
-	public @ResponseBody String greeting() {
+	public @ResponseBody String greeting(Object object) {
 		return "Hello, World";
 	}
 }
