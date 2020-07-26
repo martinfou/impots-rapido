@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,7 +15,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import com.compica.impotsrapido.dto.FinancialTransaction;
+import com.webcohesion.ofx4j.domain.data.common.Transaction;
+import com.webcohesion.ofx4j.domain.data.common.TransactionList;
 
 public class ExcelFactory {
 	
@@ -34,7 +37,7 @@ public class ExcelFactory {
 			String fileName, 
 			String sheetName, 
 			List<String> columnNames,
-			List<FinancialTransaction> financialTrasactionList) {
+			TransactionList financialTransactionList) {
 		
 		if(sheetName == null) {
 			sheetName = "RAW_DATA";
@@ -44,19 +47,10 @@ public class ExcelFactory {
 			columnNames = new LinkedList<>();
 			columnNames.add("Column1");
 		}
-		
-		if(financialTrasactionList == null) {
-			financialTrasactionList = new LinkedList<FinancialTransaction>();
-			FinancialTransaction ft= new FinancialTransaction();
-			ft.setAmount(66.99);
-			financialTrasactionList.add(ft);
-		}
 		 
 		System.out.println("path " + path.toAbsolutePath().normalize());
 		System.out.println("fileName " + fileName);
-		
-		
-		
+				
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(sheetName);
 		
@@ -70,10 +64,39 @@ public class ExcelFactory {
 			
 		}
         
-        for (FinancialTransaction financialTransaction : financialTrasactionList) {
-        	row = sheet.createRow(1);
-			Cell cell = row.createCell(1);
-			cell.setCellValue("biteme");
+        for (Transaction financialTransaction : financialTransactionList.getTransactions()){
+        	rowNum = rowNum + 1;
+        	row=sheet.createRow(rowNum);
+        	// Date	Categories	Description	Details	Mois	Montant
+        	System.out.println(rowNum);
+        	System.out.println(financialTransaction.toString());
+			Cell cellDate = row.createCell(0);
+        	Cell cellTransactionType = row.createCell(1);
+        	Cell cellCategories = row.createCell(2);
+        	Cell cellDescription = row.createCell(3);
+        	Cell cellMemo = row.createCell(4);
+        	Cell cellName = row.createCell(5);
+        	Cell cellMois = row.createCell(6);
+        	Cell cellMontant = row.createCell(7);
+
+        	
+        	Date datePosted = financialTransaction.getDatePosted();
+        	Calendar calendar = Calendar.getInstance();
+
+        	
+        	calendar.setTime(datePosted);
+        	int year = calendar.get(Calendar.YEAR);
+        	int month = calendar.get(Calendar.MONTH)+1;
+        	int day = calendar.get(Calendar.DAY_OF_MONTH);
+        	cellDate.setCellValue(year+"-"+month+"-"+day);
+        	cellTransactionType.setCellValue(financialTransaction.getTransactionType().toString());
+        	cellCategories.setCellValue("cat");
+        	cellDescription.setCellValue("desc");
+        	cellMemo.setCellValue(financialTransaction.getMemo());
+        	cellName.setCellValue(financialTransaction.getName());
+        	cellMois.setCellValue(calendar.get(Calendar.MONTH)+1);
+        	cellMontant.setCellValue(financialTransaction.getAmount());
+        	
 		}
         
         try {

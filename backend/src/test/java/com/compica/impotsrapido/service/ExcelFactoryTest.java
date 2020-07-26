@@ -25,7 +25,6 @@ public class ExcelFactoryTest {
 	
 	final Path outputDir = Paths.get(".", "src","test","resources","output");
 
-	@Test
 	void generateExcelDocument_() throws IOException {
 		String fileName = "testExcelCreation.xlsx";
 		ExcelFactory.generateExcelDocument(outputDir, fileName);
@@ -34,7 +33,6 @@ public class ExcelFactoryTest {
 		assertEquals(true, tmpFile.delete());
 	}
 
-	@Test
 	void generateExcelDocument_INPUT_sheet_name_testTabName_OUTPUT_excel_document_with_sheet_name_testTabName()
 			throws IOException {
 		String fileName = "testExcelTab.xlsx";
@@ -53,7 +51,7 @@ public class ExcelFactoryTest {
 		assertEquals(true,tmpFile.delete());
 	}
 	
-	@Test
+	
 	void generateExcelDocument_INPUT_valid_column_name_OUTPUT_excel_document_with_valid_column_name()
 			throws IOException {
 		String fileName = "testExcelColumnName.xlsx";
@@ -87,25 +85,22 @@ public class ExcelFactoryTest {
 		String tabName = "testTabName";
 		List<String> columnNames = new LinkedList<>();
 		columnNames.add("Date");
+		columnNames.add("Transaction Type");
 		columnNames.add("Categories");
 		columnNames.add("Description");
-		columnNames.add("Details");
+		columnNames.add("Memo");
+		columnNames.add("Name");
 		columnNames.add("Mois");
 		columnNames.add("Montant");
 		
-		List<FinancialTransaction> financialTrasactionList = new LinkedList<FinancialTransaction>();
-		FinancialTransaction financialTransaction = new FinancialTransaction();
-		financialTransaction.setDate(new Date());
-		financialTransaction.setCategory("9270 - Frais bancaire");
-		financialTransaction.setDescription("test description");
-		financialTransaction.setDetail("test details");
-		financialTransaction.setMonth(12);
-		financialTransaction.setAmount(66.99);
+		FinancialDataParser financialDataParser = new FinancialDataParser();
+		ClassLoader classLoader = new ExcelFactoryTest().getClass().getClassLoader();
+		File file = new File(classLoader.getResource("desecluses2019.ofx").getFile());
+		TransactionList financialTransactionList = financialDataParser.parse(file);
 
-		ExcelFactory.generateExcelDocument(outputDir, fileName, tabName,columnNames,financialTrasactionList);
+		ExcelFactory.generateExcelDocument(outputDir, fileName, tabName,columnNames,financialTransactionList);
 		File tmpFile = new File(outputDir.toAbsolutePath().normalize() + File.separator + fileName);
 		FileInputStream excelFile = new FileInputStream(tmpFile);
-		
 		
 		Workbook workbook = new XSSFWorkbook(excelFile);
 		Sheet excelTab = workbook.getSheet(tabName);

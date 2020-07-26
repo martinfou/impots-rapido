@@ -1,9 +1,12 @@
 package com.compica.impotsrapido.service;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
+import org.springframework.stereotype.Component;
 
 import com.webcohesion.ofx4j.domain.data.MessageSetType;
 import com.webcohesion.ofx4j.domain.data.ResponseEnvelope;
@@ -12,6 +15,7 @@ import com.webcohesion.ofx4j.domain.data.common.TransactionList;
 import com.webcohesion.ofx4j.io.AggregateUnmarshaller;
 import com.webcohesion.ofx4j.io.OFXParseException;
 
+@Component
 public class FinancialDataParser {
 
 	
@@ -19,13 +23,9 @@ public class FinancialDataParser {
 		OFX
 	}
 
-	public TransactionList parse(String financialDataFile) throws IOException, OFXParseException {
+	public TransactionList parse(File financialDataFile) throws IOException, OFXParseException {
 			
-		URL fileUrl = this.getClass().getClassLoader().getResource(financialDataFile);
-		if(null==fileUrl) {
-			throw new IOException("file " + financialDataFile + " not found.");
-		}
-		InputStream file = new FileInputStream(fileUrl.getFile());
+		InputStream file = new FileInputStream(financialDataFile);
 		 AggregateUnmarshaller<ResponseEnvelope> unmarshaller  = new AggregateUnmarshaller<ResponseEnvelope>(ResponseEnvelope.class);
 		 ResponseEnvelope envelope = unmarshaller.unmarshal(file);
 		 file.close();
